@@ -8,6 +8,7 @@ public class AuthAppBackendApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(AuthAppBackendApplication.class, args);
+        System.out.println("Programming is running ..............");
 	}
 
 }
