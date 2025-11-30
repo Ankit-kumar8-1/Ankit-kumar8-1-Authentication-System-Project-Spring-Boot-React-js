@@ -14,4 +14,6 @@ public interface UserService {
     void  deleteUser(String userId);
 
     UserDto getUserById(String userId);
+
+    Iterable<UserDto> getAllUsers();
 }

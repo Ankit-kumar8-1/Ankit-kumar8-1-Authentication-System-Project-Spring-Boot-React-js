@@ -1,5 +1,6 @@
 package com.learn.auth_app_backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.Instant;
@@ -35,8 +36,10 @@ public class User {
     @Column(name = "is_enable", nullable = false)
     private boolean enable = true;
 
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
+
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt = Instant.now();

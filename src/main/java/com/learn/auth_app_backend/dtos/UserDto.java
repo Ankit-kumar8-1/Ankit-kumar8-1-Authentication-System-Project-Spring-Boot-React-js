@@ -1,8 +1,7 @@
 package com.learn.auth_app_backend.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.learn.auth_app_backend.entities.Provider;
-import com.learn.auth_app_backend.entities.Role;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,7 +25,9 @@ public class UserDto {
     private String password;
     private String image;
     private boolean enable = true;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Kolkata")
     private Instant createdAt = Instant.now();
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Kolkata")
     private Instant updatedAt = Instant.now();
     private Provider provider = Provider.LOCAL;
     private Set<RoleDto> roles = new HashSet<>();
