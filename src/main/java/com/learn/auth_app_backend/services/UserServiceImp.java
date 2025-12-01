@@ -3,6 +3,7 @@ package com.learn.auth_app_backend.services;
 import com.learn.auth_app_backend.dtos.UserDto;
 import com.learn.auth_app_backend.entities.Provider;
 import com.learn.auth_app_backend.entities.User;
+import com.learn.auth_app_backend.exception.ResourceNotFoundException;
 import com.learn.auth_app_backend.repositories.UserRepositiory;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -19,28 +20,28 @@ public class UserServiceImp implements UserService {
     private final UserRepositiory userRepositiory;
     private  final ModelMapper modelMapper;
 
+
+
     @Override
     @Transactional
     public UserDto createUser(UserDto userDto) {
-//        check email empty ya null to nahi
-        if(userDto.getEmail() == null || userDto.getEmail().isBlank()){
-            throw new IllegalArgumentException("Email is required");
-        }
 
-//        check kar rahe ke email phele se database m exit to nahi
-        if(userRepositiory.existsByEmail(userDto.getEmail())){
+        if (userRepositiory.existsByEmail(userDto.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
         }
 
-//        yha hem mne  Dto ke data ko entity m convert kiya
         User user = modelMapper.map(userDto, User.class);
-        user.setProvider(userDto.getProvider() != null ? userDto.getProvider() : Provider.LOCAL);
 
-//        OR yha per entity ko DTO m kyoki return type DTO hai
+        user.setProvider(
+                userDto.getProvider() != null
+                        ? userDto.getProvider()
+                        : Provider.LOCAL
+        );
+
         User savedUser = userRepositiory.save(user);
-        return modelMapper.map(savedUser,UserDto.class);
-    }
 
+        return modelMapper.map(savedUser, UserDto.class);
+    }
 
 
 
@@ -48,72 +49,64 @@ public class UserServiceImp implements UserService {
     @Transactional(readOnly = true)
     public UserDto getUserByEmail(String email) {
 
-//        check kar lea ke email blank ya null to nahi
-        if(email == null  || email.isBlank()){
-            throw  new IllegalArgumentException("Email is Required ! ");
+        User user = userRepositiory.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email:  " + email));
+
+        return modelMapper.map(user,UserDto.class);
+    }
+
+
+    @Transactional
+    @Override
+    public UserDto updateUser(UUID id, UserDto userDto) {
+
+        // 1. Old user lo
+        User user = userRepositiory.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // 2. Only updatable fields change karo
+        if (userDto.getName() != null) {
+            user.setName(userDto.getName());
         }
 
-//        user  get kiya from the database
-        User user = userRepositiory.findByEmail(email)
-                .orElseThrow(()-> new IllegalArgumentException("User not found"));
+        if (userDto.getPassword() != null) {
+            user.setPassword(userDto.getPassword());
+        }
 
-//         return kar dea user ko Dto m convert kar ke
-        return modelMapper.map(user,UserDto.class);
-    }
+        if (userDto.getImage() != null) {
+            user.setImage(userDto.getImage());
+        }
 
-
-
-    @Override
-    @Transactional
-    public UserDto updateUser(UserDto userDto, String userId) {
-
-//        user ko databases se lena , ager nahi mila to exception throw karna
-        User user =  userRepositiory.findById(UUID.fromString(userId))
-                .orElseThrow(()-> new IllegalArgumentException("User not found"));
-
-//        update Information
-        user.setName(userDto.getName());
         user.setEnable(userDto.isEnable());
-        user.setImage(userDto.getImage());
         user.setUpdatedAt(Instant.now());
-
-//        user  ko save karna
-        User updateUser = userRepositiory.save(user);
-
-//        or fir return karna Dto m
-        return modelMapper.map(user,UserDto.class);
+        User updatedUser = userRepositiory.save(user);
+        return modelMapper.map(updatedUser, UserDto.class);
     }
 
 
-
-
     @Override
-    public void deleteUser(String userId) {
+    public void deleteUserById(UUID userId) {
 
-//        input m string id ko actual uuid m convert kiya
-        UUID id = UUID.fromString(userId);
+        UUID id = userId;
 
-//        database se id hai ya nahi check kiya
         userRepositiory.findById(id)
-                .orElseThrow(()->new IllegalArgumentException("User Not found"));
+                .orElseThrow(()->new ResourceNotFoundException("User Not found"));
 
-//        user ko remove kiya through ID
+        System.out.println("Remove successful");
         userRepositiory.deleteById(id);
-
-//        proper response de dea
-        System.out.println("Remove Successful");
     }
 
 
 
     @Override
     @Transactional(readOnly = true)
-    public UserDto getUserById(String userId) {
-        User user =  userRepositiory.findById(UUID.fromString(userId))
-                .orElseThrow(()->new IllegalArgumentException("User not Found !"));
+    public UserDto getUserById(UUID userId) {
+        User user =  userRepositiory.findById(userId)
+                .orElseThrow(()->new ResourceNotFoundException("User not Found !"));
 
         return modelMapper.map(user,UserDto.class);
     }
+
 
     @Override
     @Transactional(readOnly = true)

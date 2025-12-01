@@ -1,6 +1,5 @@
 package com.learn.auth_app_backend.entities;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.Instant;
@@ -30,16 +29,14 @@ public class User {
     @Column(name = "user_password", nullable = false)
     private String password;
 
-    @Column(name = "profile_image")
+    @Column(name = "profile_image", length = 500)
     private String image;
 
     @Column(name = "is_enable", nullable = false)
     private boolean enable = true;
 
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
-
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt = Instant.now();
@@ -55,7 +52,6 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
-
 
     @PrePersist
     protected void onCreate() {
