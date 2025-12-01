@@ -1,10 +1,11 @@
-package com.learn.auth_app_backend.services;
+package com.learn.auth_app_backend.services.implementation;
 
 import com.learn.auth_app_backend.dtos.UserDto;
 import com.learn.auth_app_backend.entities.Provider;
 import com.learn.auth_app_backend.entities.User;
 import com.learn.auth_app_backend.exception.ResourceNotFoundException;
 import com.learn.auth_app_backend.repositories.UserRepositiory;
+import com.learn.auth_app_backend.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
