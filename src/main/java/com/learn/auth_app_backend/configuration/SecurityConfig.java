@@ -1,0 +1,26 @@
+package com.learn.auth_app_backend.configuration;
+
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public UserDetailsService user(){
+        User.UserBuilder userBuilder = User.withDefaultPasswordEncoder();
+
+        UserDetails user1 = userBuilder.username("Rohit").password("efc").roles("ADMIN").build();
+        UserDetails user2 = userBuilder.username("ankit").password("abc").roles("ADMIN").build();
+        UserDetails user3 = userBuilder.username("neeraj").password("def").roles("ADMIN").build();
+
+
+        return new InMemoryUserDetailsManager(user1,user2,user3);
+
+    }
+}
